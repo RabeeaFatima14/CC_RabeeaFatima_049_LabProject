@@ -1,0 +1,7 @@
+---
+- name: Test Backend Role
+  hosts: backends
+  become: yes
+  roles:
+    - backend
+

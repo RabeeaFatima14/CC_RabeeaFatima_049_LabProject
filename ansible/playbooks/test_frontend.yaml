@@ -1,0 +1,10 @@
+---
+- name: Test Frontend Role
+  hosts: frontend
+  become: yes
+  vars:
+    backend1_private_ip: "10.0.10.94"
+    backend2_private_ip: "10.0.10.149"
+    backup_backend_private_ip: "10.0.10.121"
+  roles:
+    - frontend

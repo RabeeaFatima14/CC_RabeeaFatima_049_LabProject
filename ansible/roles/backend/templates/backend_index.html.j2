@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Server - {{ inventory_hostname }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 3em;
+        }
+        .info {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            font-size: 1.2em;
+        }
+        .label {
+            font-weight: bold;
+            color: #ffd700;
+        }
+        .hostname {
+            font-size: 2em;
+            color: #00ff00;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Backend Server</h1>
+        
+        <div class="hostname">
+            {{ inventory_hostname }}
+        </div>
+
+        <div class="info">
+            <span class="label">Hostname:</span> {{ ansible_hostname }}
+        </div>
+
+        <div class="info">
+            <span class="label">Private IP:</span> {{ ansible_default_ipv4.address | default('N/A') }}
+        </div>
+
+        <div class="info">
+            <span class="label">Distribution:</span> {{ ansible_distribution }} {{ ansible_distribution_version }}
+        </div>
+
+        <div class="info">
+            <span class="label">Role:</span> HTTPD Backend Server
+        </div>
+
+        <div class="info">
+            <span class="label">Status:</span> ✅ Active and Running
+        </div>
+    </div>
+</body>
+</html>
+

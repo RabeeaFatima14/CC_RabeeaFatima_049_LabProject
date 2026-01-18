@@ -119,3 +119,53 @@ resource "aws_instance" "backend" {
   }
 }
 
+# Null Resource to Trigger Ansible Configuration
+resource "null_resource" "configure_servers" {
+  # Triggers - re-run if any instance IP changes
+  triggers = {
+    frontend_ip  = aws_instance.frontend.public_ip
+    backend_ips  = join(",", [for instance in aws_instance.backend : instance.public_ip])
+    always_run   = timestamp()
+  }
+
+  # Dependencies - wait for all instances to be ready
+  depends_on = [
+    aws_instance.frontend,
+    aws_instance.backend
+  ]
+
+   provisioner "local-exec" {
+    command = <<-EOT
+      #!/bin/bash
+      set -e
+      
+      echo "Generating Ansible inventory..."
+      FRONTEND_IP="${aws_instance.frontend.public_ip}"
+      BACKEND1_IP="${aws_instance.backend[0].public_ip}"
+      BACKEND2_IP="${aws_instance.backend[1].public_ip}"
+      BACKEND3_IP="${aws_instance.backend[2].public_ip}"
+      
+      cat > ansible/inventory/hosts << EOF
+[frontend]
+$FRONTEND_IP
+
+[backends]
+$BACKEND1_IP
+$BACKEND2_IP
+$BACKEND3_IP
+
+[all:vars]
+ansible_user=ec2-user
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
+ansible_python_interpreter=/usr/bin/python3
+EOF
+      
+      echo "Waiting for instances to be fully ready..."
+      sleep 60
+      
+      echo "Running Ansible playbook..."
+      cd ansible
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook playbooks/site.yaml
+    EOT
+  }
+}
