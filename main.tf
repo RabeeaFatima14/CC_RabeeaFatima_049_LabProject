@@ -73,3 +73,49 @@ resource "aws_security_group" "myapp_sg" {
   }
 }
 
+# SSH Key Pair
+resource "aws_key_pair" "myapp_key" {
+  key_name   = "${var.env_prefix}-key"
+  public_key = file(var.public_key)
+
+  tags = {
+    Name = "${var.env_prefix}-key"
+  }
+}
+# Frontend EC2 Instance (Nginx)
+resource "aws_instance" "frontend" {
+  ami                    = "ami-07aca7a231992279f" 
+  instance_type          = var.instance_type
+  subnet_id              = module.myapp-subnet.subnet.id
+  vpc_security_group_ids = [aws_security_group.myapp_sg.id]
+  availability_zone      = var.availability_zone
+  key_name               = aws_key_pair.myapp_key.key_name
+
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "${var.env_prefix}-frontend"
+    Type = "frontend"
+    Role = "nginx"
+  }
+}
+
+# Backend EC2 Instances (HTTPD) - 3 instances
+resource "aws_instance" "backend" {
+  count                  = 3
+  ami                    = "ami-07aca7a231992279f"  
+  instance_type          = var.instance_type
+  subnet_id              = module.myapp-subnet.subnet.id
+  vpc_security_group_ids = [aws_security_group.myapp_sg.id]
+  availability_zone      = var.availability_zone
+  key_name               = aws_key_pair.myapp_key.key_name
+
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "${var.env_prefix}-backend-${count.index + 1}"
+    Type = "backend"
+    Role = "httpd"
+  }
+}
+
