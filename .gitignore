@@ -1,0 +1,26 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform.lock.hcl
+
+# SSH Keys
+*.pem
+.ssh/id_*
+!.ssh/id_*.pub
+
+# AWS Credentials
+.aws/
+
+# Python
+__pycache__/
+*.pyc
+
+# Ansible
+*.retry
+
+# OS
+.DS_Store
+Thumbs.db
+
